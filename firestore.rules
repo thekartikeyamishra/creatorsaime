@@ -1,0 +1,39 @@
+rules_version = '2';
+
+// CreatorsAI — Firestore Security Rules
+//
+// Architecture: ALL writes go through server API routes using the Admin SDK (which bypasses
+// these rules) after server-side validation, authorization, rate limiting and audit logging.
+// Clients get read access only to their own non-sensitive documents. Everything else is denied.
+// Default: deny.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // Own account document (role, handle, status). Read-only.
+    match /users/{uid} {
+      allow get: if isSelf(uid);
+      allow list, create, update, delete: if false;
+    }
+
+    // Own profile. Read-only from the client; edits go through /api/profile.
+    match /creatorProfiles/{uid} {
+      allow get: if isSelf(uid);
+      allow list, create, update, delete: if false;
+    }
+    match /brandProfiles/{uid} {
+      allow get: if isSelf(uid);
+      allow list, create, update, delete: if false;
+    }
+
+    // Everything else — waitlist, invites, referral codes, handles, social accounts,
+    // verifications, trust signals, consent records, data requests, audit logs,
+    // rate limits and all future financial collections — is server-only.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

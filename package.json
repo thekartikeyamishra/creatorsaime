@@ -1,0 +1,47 @@
+{
+  "name": "creatorsai",
+  "version": "0.7.0",
+  "private": true,
+  "description": "CreatorsAI — the Creator Growth Network. Stage 1 Foundation + Stage 2 Deal Desk & Campaigns + v0.3 Revenue & Retention.",
+  "author": "Kartikeya Mishra",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-creatorsai \"vitest run --config vitest.rules.config.mts\"",
+    "verify": "npm run typecheck && npm run test && npm run build",
+    "set-admin": "node scripts/set-admin.mjs",
+    "icons": "node scripts/generate-icons.mjs"
+  },
+  "dependencies": {
+    "firebase": "^13.2.0",
+    "firebase-admin": "^14.5.0",
+    "geist": "^1.9.2",
+    "next": "^16.4.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "firebase-tools": "^15.35.0",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^4.3.5",
+    "typescript": "5.9",
+    "vitest": "^5.1.0"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.7"
+  }
+}

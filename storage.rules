@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// Uploads are not enabled in Stage 1. When portfolio/media uploads arrive (Stage 2),
+// they must go through signed, short-lived upload URLs with type/size validation and
+// malware scanning — not direct client writes.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
