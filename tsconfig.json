@@ -31,13 +31,27 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "next.config.ts",
+    "vitest.config.mts",
+    "vitest.rules.config.mts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    ".next"
+    ".next",
+    "out",
+    "coverage",
+    "components",
+    "lib",
+    "app",
+    "pages",
+    "hooks",
+    "styles",
+    "public"
   ]
 }

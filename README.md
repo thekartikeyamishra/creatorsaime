@@ -47,6 +47,11 @@ v0.4 turns everyday Deal Desk usage into data nobody else has. See **docs/MOATS.
 
 Live at **https://creatorsai.me** · built in public by Kartikeya Mishra — follow [@KartikeyahereX](https://x.com/KartikeyahereX)
 
+## What's new in v0.8
+
+- **Admin → Setup check** (`/admin/setup`): every integration at a glance (Firebase, Razorpay, WhatsApp, email, cron, Node, MFA) plus read-only live connection tests. Never displays secret values.
+- **Build hardening**: type-checks only CreatorsAI code, pre-build guard against leftover files from other projects, Node pinned to 22.x, `firebase-tools` removed from installs (≈2 min faster Vercel builds).
+
 ## v0.3 — making it pay, and making it a habit
 
 | | What shipped |

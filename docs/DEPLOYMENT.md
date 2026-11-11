@@ -7,10 +7,9 @@
 4. **Service account** (Project settings → Service accounts → Generate key). Never commit it.
 5. Deploy rules + indexes + TTL policy:
    ```powershell
-   npm i -g firebase-tools
-   firebase login
+   npx -y firebase-tools@15 login
    Copy-Item .firebaserc.example .firebaserc   # set your project ids
-   firebase deploy --only firestore,storage
+   npx -y firebase-tools@15 deploy --only firestore,storage
    ```
    The `rateLimits.expiresAt` TTL override in `firestore.indexes.json` enables automatic cleanup.
 
@@ -42,3 +41,10 @@ See `.env.example`. Required in production: `NEXT_PUBLIC_SITE_URL`, all `NEXT_PU
 - [ ] App Check enabled; Search Console + Bing Webmaster verified; sitemap submitted
 - [ ] Uptime monitor on `/api/health`; Firestore PITR/backups on
 - [ ] Firebase Auth email templates branded (sender name "CreatorsAI")
+
+
+## Troubleshooting Vercel builds
+
+- **`Cannot find module '@/lib/site'`, `lucide-react`, `AdUnit.tsx`…** — files from another project are in the repo root. CreatorsAI lives only in `src/`. The build now ignores stray root `components/`, `lib/` etc., and `npm run build` stops with a clear message if a root `app/`, `pages/`, `middleware.*` or `next.config.js/.mjs` exists (those would replace the app or its config). Remove them: `git rm -r app pages next.config.mjs` → commit → push.
+- **Node version** — `engines` is pinned to `22.x` (Node 22 LTS). In Vercel → Settings → Build and Deployment → Node.js Version, choose 22.x.
+- **After setting env vars** — open **/admin/setup** on the live site and press **Test live connections**. It validates Firebase, Razorpay keys, the WhatsApp token/phone number ID and the Resend domain without sending or charging anything.
