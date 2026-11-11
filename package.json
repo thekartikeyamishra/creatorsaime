@@ -1,6 +1,6 @@
 {
   "name": "creatorsai",
-  "version": "0.9.0",
+  "version": "0.11.1",
   "private": true,
   "description": "CreatorsAI \u2014 the Creator Growth Network. Stage 1 Foundation + Stage 2 Deal Desk & Campaigns + v0.3 Revenue & Retention \u00b7 v0.8 Setup check \u00b7 v0.9 Free tools, guides, AdSense & interactions.",
   "author": "Kartikeya Mishra",
@@ -19,7 +19,8 @@
     "set-admin": "node scripts/set-admin.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "prebuild": "node scripts/check-repo.mjs",
-    "check-repo": "node scripts/check-repo.mjs"
+    "check-repo": "node scripts/check-repo.mjs",
+    "create-test-user": "node scripts/create-test-user.mjs"
   },
   "dependencies": {
     "firebase": "^13.2.0",

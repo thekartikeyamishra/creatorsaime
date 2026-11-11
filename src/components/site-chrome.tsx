@@ -22,7 +22,7 @@ export function SiteHeader() {
           <Link href="/login" className="hidden rounded-xl px-3 py-2 text-sm font-medium text-slate-300 hover:text-white sm:inline-flex">
             Sign in
           </Link>
-          <span data-magnetic className="inline-flex"><ButtonLink href="/join" className="!px-3.5 !py-2">Request invite</ButtonLink></span>
+          <span data-magnetic className="inline-flex"><ButtonLink href="/signup" className="!px-3.5 !py-2">Join free</ButtonLink></span>
         </div>
       </div>
       <nav aria-label="Sections" className="border-t border-white/10 lg:hidden">

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { ZodError, type ZodType } from "zod";
 import { ServiceUnavailableError } from "@/lib/firebase/admin";
 import { site } from "@/lib/config";
+import { classifyFirebaseError } from "./firebase-errors";
 
 export class ApiError extends Error {
   constructor(
@@ -47,8 +48,14 @@ function errorResponse(err: unknown): NextResponse {
     console.error("[api] service unavailable:", err.message);
     return json({ error: { code: "service_unavailable", message: "Service is temporarily unavailable. Please try again shortly." } }, 503);
   }
-  console.error("[api] unhandled error:", err);
-  return json({ error: { code: "internal_error", message: "Something went wrong. Please try again." } }, 500);
+  const fb = classifyFirebaseError(err);
+  if (fb) {
+    console.error(`[api] firebase problem: ${fb.code} — ${fb.hint}`, err);
+    return json({ error: { code: fb.code, message: "Service is temporarily unavailable. Please try again shortly." } }, 503);
+  }
+  const ref = Math.random().toString(36).slice(2, 10);
+  console.error(`[api] unhandled error ref=${ref}:`, err);
+  return json({ error: { code: "internal_error", message: `Something went wrong. Please try again. (ref ${ref})`, ref } }, 500);
 }
 
 type Handler<C> = (req: Request, ctx: C) => Promise<Response>;

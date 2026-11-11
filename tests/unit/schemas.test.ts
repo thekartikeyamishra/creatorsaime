@@ -97,3 +97,16 @@ describe("brandVerificationSchema", () => {
 describe("cleanText", () => {
   it("collapses whitespace", () => expect(cleanText("  a \t  b  ")).toBe("a b"));
 });
+
+import { registerSchema } from "@/lib/schemas";
+describe("registerSchema", () => {
+  it("accepts a valid open sign-up", () => {
+    const r = registerSchema.parse({ role: "creator", name: "  Riya  ", termsAccepted: true });
+    expect(r).toMatchObject({ role: "creator", name: "Riya", city: "", marketingConsent: false });
+  });
+  it("requires terms and a real role/name", () => {
+    expect(registerSchema.safeParse({ role: "creator", name: "Riya", termsAccepted: false }).success).toBe(false);
+    expect(registerSchema.safeParse({ role: "admin", name: "Riya", termsAccepted: true }).success).toBe(false);
+    expect(registerSchema.safeParse({ role: "brand", name: "R", termsAccepted: true }).success).toBe(false);
+  });
+});

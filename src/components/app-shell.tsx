@@ -13,7 +13,7 @@ import { Badge, Button, Logo, Notice, Spinner, cx } from "./ui";
 type NavItem = { href: string; label: string };
 
 export function AppShell({ nav, requireAdmin, children }: { nav: NavItem[]; requireAdmin?: boolean; children: ReactNode }) {
-  const { configured, loading, user, me, meError, signOut } = useAuth();
+  const { configured, loading, user, me, meError, signOut, refreshMe } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useLocale();
@@ -28,6 +28,12 @@ export function AppShell({ nav, requireAdmin, children }: { nav: NavItem[]; requ
     if (configured && !loading && !user) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
   }, [configured, loading, user, pathname, router]);
 
+  // Signed in but no CreatorsAI account yet (e.g. signed in with Google first) → finish free sign-up.
+  const needsSetup = Boolean(user && me && !me.member && !me.isAdmin && !requireAdmin);
+  useEffect(() => {
+    if (needsSetup) router.replace("/signup");
+  }, [needsSetup, router]);
+
   if (!configured) {
     return (
       <div className="container-page py-20">
@@ -35,11 +41,18 @@ export function AppShell({ nav, requireAdmin, children }: { nav: NavItem[]; requ
       </div>
     );
   }
-  if (loading || !user) return <Spinner />;
+  if (loading || !user || needsSetup) return <Spinner />;
   if (meError && !me) {
     return (
-      <div className="container-page py-20">
+      <div className="container-page max-w-xl space-y-4 py-20">
         <Notice tone="error">{meError}</Notice>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={() => void refreshMe()}>Try again</Button>
+          <Button variant="ghost" onClick={() => void signOut()}>Sign out</Button>
+        </div>
+        <p className="text-xs text-muted">
+          Site owner? Open <a className="font-medium text-brand underline" href="/api/health?deep=1" target="_blank" rel="noreferrer">/api/health?deep=1</a> to see what needs fixing.
+        </p>
       </div>
     );
   }

@@ -34,6 +34,7 @@ export function LoginForm() {
       await signInWithEmailAndPassword(auth, email.trim(), password);
     } catch (err) {
       setError(authErrorMessage(err));
+      if (process.env.NODE_ENV !== "production") console.warn("[auth]", err);
     } finally {
       setBusy(null);
     }
@@ -77,7 +78,7 @@ export function LoginForm() {
       title="Welcome back"
       subtitle={
         <>
-          CreatorsAI is invite-only. No invite yet? <Link href="/join" className="font-medium text-brand hover:underline">Request one</Link>.
+          New here? <Link href="/signup" className="font-medium text-brand hover:underline">Create a free account</Link>.
         </>
       }
     >

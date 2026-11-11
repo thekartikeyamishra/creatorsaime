@@ -126,8 +126,8 @@ export function NextStep({ title, body, role = "creator", from }: { title: strin
       <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{body}</p>
       <div className="mt-5 flex flex-wrap gap-3">
-        <Link data-magnetic href={`/join?role=${role}&utm_source=tool&utm_campaign=${from}`} className="inline-flex items-center rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-ink hover:bg-slate-100">
-          Request your invite →
+        <Link data-magnetic href={`/signup?role=${role}&utm_source=tool&utm_campaign=${from}`} className="inline-flex items-center rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-ink hover:bg-slate-100">
+          Create your free account →
         </Link>
         <Link href="/why-switch" className="inline-flex items-center rounded-xl px-4 py-2.5 text-sm font-medium text-slate-300 ring-1 ring-white/20 hover:text-white">
           How CreatorsAI works

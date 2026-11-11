@@ -1,11 +1,11 @@
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
-import { CREATOR_CATEGORIES, PROFESSIONAL_SKILLS, SCHEMA_VERSION, type Role } from "@/lib/config";
-import { slugifyHandle } from "@/lib/ids";
+import type { Role } from "@/lib/config";
 import { redeemInviteSchema } from "@/lib/schemas";
 import { auditIn } from "@/lib/server/audit";
 import { requireAuth } from "@/lib/server/auth";
-import { C, profileCollection } from "@/lib/server/collections";
+import { C } from "@/lib/server/collections";
+import { createMemberInTx } from "@/lib/server/members";
 import { sha256 } from "@/lib/server/crypto";
 import { ApiError, assertSameOrigin, json, readJson, route } from "@/lib/server/http";
 import { enforceRateLimit, RULES } from "@/lib/server/rate-limit";
@@ -47,67 +47,21 @@ export const POST = route(async (req) => {
     const w = waitlist.exists ? waitlist.data()! : {};
     const name = (w.name as string | undefined) || ctx.token.name || ctx.email!.split("@")[0]!;
 
-    const candidates = Array.from({ length: 4 }, () => slugifyHandle(name));
-    const handleSnaps = await Promise.all(candidates.map((h) => tx.get(db.collection(C.handles).doc(h))));
-    const idx = handleSnaps.findIndex((s) => !s.exists);
-    if (idx === -1) throw new Error("Could not allocate handle");
-    const handle = candidates[idx]!;
-
-    // ── writes ──
-    const now = FieldValue.serverTimestamp();
-    tx.create(userRef, {
-      uid: ctx.uid,
-      role: inv.role,
-      email: ctx.email,
-      displayName: name,
-      handle,
-      status: "active",
-      waitlistId: inv.waitlistId,
-      marketingConsent: Boolean(w.marketingConsent),
-      createdAt: now,
-      updatedAt: now,
-      schemaVersion: SCHEMA_VERSION,
-    });
-    tx.create(db.collection(C.handles).doc(handle), { uid: ctx.uid, createdAt: now });
-
     const city = (w.city as string | undefined) ?? "";
-    if (inv.role === "brand") {
-      tx.create(db.collection(profileCollection("brand")).doc(ctx.uid), {
-        uid: ctx.uid,
-        displayName: name,
-        handle,
-        bio: "",
-        city,
-        industry: (w.category as string | undefined) ?? "Other",
-        website: (w.link as string | undefined) ?? "",
-        isPublic: false,
-        verified: false,
-        createdAt: now,
-        updatedAt: now,
-        schemaVersion: SCHEMA_VERSION,
-      });
-    } else {
-      const cat = w.category as string | undefined;
-      const valid = cat && ([...CREATOR_CATEGORIES, ...PROFESSIONAL_SKILLS] as readonly string[]).includes(cat);
-      tx.create(db.collection(profileCollection(inv.role)).doc(ctx.uid), {
-        uid: ctx.uid,
-        kind: inv.role,
-        displayName: name,
-        handle,
-        bio: "",
-        city,
-        categories: valid ? [cat] : [],
-        languages: Array.isArray(w.languages) ? w.languages : [],
-        portfolioLinks: w.link ? [w.link] : [],
-        rateCardNote: "",
-        openToPods: true,
-        isPublic: false,
-        verifiedPlatforms: [],
-        createdAt: now,
-        updatedAt: now,
-        schemaVersion: SCHEMA_VERSION,
-      });
-    }
+    const { handle } = await createMemberInTx(tx, db, {
+      uid: ctx.uid,
+      email: ctx.email!,
+      name,
+      role: inv.role,
+      city,
+      category: w.category as string | undefined,
+      link: w.link as string | undefined,
+      languages: Array.isArray(w.languages) ? (w.languages as string[]) : [],
+      marketingConsent: Boolean(w.marketingConsent),
+      waitlistId: inv.waitlistId,
+      joinedVia: "invite",
+    });
+    const now = FieldValue.serverTimestamp();
     tx.update(inviteRef, { status: "redeemed", redeemedBy: ctx.uid, redeemedAt: now });
     if (waitlist.exists) tx.update(waitlistRef, { status: "joined", uid: ctx.uid, updatedAt: now });
     auditIn(tx, {

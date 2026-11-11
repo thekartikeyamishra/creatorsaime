@@ -14,6 +14,7 @@ export type RateLimitRule = { bucket: string; limit: number; windowSeconds: numb
 export const RULES = {
   waitlistPerIp: { bucket: "waitlist-ip", limit: 5, windowSeconds: 3600 },
   redeemPerUser: { bucket: "redeem-user", limit: 10, windowSeconds: 3600 },
+  registerPerIp: { bucket: "register-ip", limit: 8, windowSeconds: 3600 },
   writePerUser: { bucket: "write-user", limit: 60, windowSeconds: 600 },
   verificationPerUser: { bucket: "verify-user", limit: 10, windowSeconds: 86400 },
   dataRequestPerUser: { bucket: "data-request-user", limit: 5, windowSeconds: 86400 },

@@ -176,6 +176,17 @@ export const brandVerificationSchema = z.object({
   registeredAddress: text(10, 300),
 });
 
+/** Open sign-up: free account (Deal Desk, tools, profile). Network trust still comes from verifications. */
+export const registerSchema = z.object({
+  role: z.enum(ROLES),
+  name: z.string().trim().min(2, "Enter your name").max(80),
+  city: z.string().trim().max(60).optional().default(""),
+  category: z.string().trim().max(60).optional(),
+  marketingConsent: z.boolean().optional().default(false),
+  termsAccepted: z.literal(true, "You must accept the Terms and Privacy Policy"),
+});
+export type RegisterInput = z.infer<typeof registerSchema>;
+
 export const redeemInviteSchema = z.object({
   code: z.string().trim().min(20).max(80).regex(/^[A-Za-z0-9_-]+$/, "Invalid invite code"),
 });

@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return data;
     } catch (e) {
       setMe(null);
-      setMeError(e instanceof ApiClientError ? e.message : "Could not load your account");
+      setMeError(e instanceof ApiClientError ? (e.status >= 500 ? `We couldn't load your account right now (${e.code}). Please try again in a minute.` : e.message) : "Could not load your account. Check your connection and try again.");
       return null;
     }
   }, []);

@@ -47,6 +47,19 @@ v0.4 turns everyday Deal Desk usage into data nobody else has. See **docs/MOATS.
 
 Live at **https://creatorsai.me** · built in public by Kartikeya Mishra — follow [@KartikeyahereX](https://x.com/KartikeyahereX)
 
+## What's new in v0.11
+
+- **Self-diagnosis:** `/api/health?deep=1` checks Firebase config, admin key, Auth and Firestore and names the fix (no secrets).
+- Firebase/Firestore failures now return **503 with a specific code** instead of an opaque 500; the app shows *Try again* / *Sign out* instead of a dead end.
+- `create-test-user` explains setup errors (database missing, Auth not initialised, wrong key).
+
+## What's new in v0.10
+
+- **Free sign-up** for creators, brands and professionals (email + verification, or Google); invite links still work.
+- **Clear sign-in errors**: Firebase setup problems now say exactly what to fix instead of "Something went wrong".
+- **Test account script**: `npm run create-test-user -- test@creatorsai.me "<password>"` (and `--delete` before launch).
+- Setup guide: `docs/AUTH-SETUP.md`.
+
 ## What's new in v0.9
 
 - **5 free public tools** (`/tools`): creator rate calculator, GST invoice generator, collaboration agreement generator, ASCI ad-disclosure checker, engagement rate calculator — private (run in the browser), no sign-up, progress saved, each ending in a sign-up step.

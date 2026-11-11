@@ -61,7 +61,7 @@ export default function HomePage() {
       <section data-spotlight className="grid-glow relative overflow-hidden bg-ink text-white">
         <div className="container-page grid gap-12 py-20 sm:py-28 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
-            <Badge tone="teal">Invite-only · First cohort now forming</Badge>
+            <Badge tone="teal">Free for creators · First verified cohort forming</Badge>
             <h1 className="text-balance mt-6 text-4xl font-semibold tracking-tight sm:text-6xl">
               Your next collaboration <span className="bg-gradient-to-r from-blue-400 to-teal bg-clip-text text-transparent">starts here.</span>
             </h1>
@@ -69,8 +69,8 @@ export default function HomePage() {
               A growing network of creators, brands and communities building real opportunities together — verified, fairly paid and local first.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <span data-magnetic className="inline-flex"><ButtonLink href="/join?role=creator" className="!px-6 !py-3 text-base">Join as a Creator</ButtonLink></span>
-              <span data-magnetic className="inline-flex"><ButtonLink href="/join?role=brand" variant="light" className="!px-6 !py-3 text-base">Find Your Next Creator</ButtonLink></span>
+              <span data-magnetic className="inline-flex"><ButtonLink href="/signup?role=creator" className="!px-6 !py-3 text-base">Join free as a Creator</ButtonLink></span>
+              <span data-magnetic className="inline-flex"><ButtonLink href="/signup?role=brand" variant="light" className="!px-6 !py-3 text-base">Find Your Next Creator</ButtonLink></span>
             </div>
             <p className="mt-5 text-sm text-slate-400">
               Organise creators in your city?{" "}
