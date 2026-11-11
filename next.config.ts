@@ -9,15 +9,22 @@ const isDev = process.env.NODE_ENV !== "production";
  * nonce-based upgrade path. Everything else is locked to the minimum origins Firebase
  * Auth / Firestore need.
  */
+// Google AdSense + its consent (Funding Choices) message. Ads load only on /tools and /guides.
+const ADS = {
+  script: "https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.adtrafficquality.google https://www.googletagservices.com https://fundingchoicesmessages.google.com https://*.google.com",
+  frame: "https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.googlesyndication.com https://*.adtrafficquality.google https://www.google.com https://fundingchoicesmessages.google.com",
+  connect: "https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.adtrafficquality.google https://*.doubleclick.net https://*.google.com https://fundingchoicesmessages.google.com",
+};
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://checkout.razorpay.com${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://checkout.razorpay.com ${ADS.script}${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.googleusercontent.com https://*.razorpay.com",
+  "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://apis.google.com https://api.razorpay.com https://lumberjack.razorpay.com" +
+  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://apis.google.com https://api.razorpay.com https://lumberjack.razorpay.com " + ADS.connect +
     (isDev ? " ws: http://localhost:* http://127.0.0.1:*" : ""),
-  "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com https://api.razorpay.com https://checkout.razorpay.com",
+  "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com https://api.razorpay.com https://checkout.razorpay.com " + ADS.frame,
   "worker-src 'self'",
   "manifest-src 'self'",
   "object-src 'none'",

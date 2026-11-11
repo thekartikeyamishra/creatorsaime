@@ -54,6 +54,13 @@ describe("setupReport", () => {
     expect(item(r, "FIREBASE_SERVICE_ACCOUNT_BASE64")?.status).toBe("invalid");
     expect(item(r, "HASH_SALT")?.status).toBe("invalid");
   });
+  it("reports AdSense publisher and ad-unit setup", () => {
+    expect(item(setupReport(full), "NEXT_PUBLIC_ADSENSE_CLIENT")?.status).toBe("ok");
+    expect(item(setupReport(full), "NEXT_PUBLIC_ADSENSE_SLOT_TOOL")?.status).toBe("warn");
+    const all = setupReport({ ...full, NEXT_PUBLIC_ADSENSE_SLOT_TOOL: "1234567890", NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE: "2234567890", NEXT_PUBLIC_ADSENSE_SLOT_MULTIPLEX: "3234567890" });
+    expect(item(all, "NEXT_PUBLIC_ADSENSE_SLOT_TOOL")?.status).toBe("ok");
+    expect(item(setupReport({ ...full, NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE: "abc" }), "NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE")?.status).toBe("invalid");
+  });
   it("checks Resend key prefix and sender", () => {
     const r = setupReport({ ...full, RESEND_API_KEY: "abc" });
     expect(item(r, "RESEND_API_KEY")?.status).toBe("invalid");

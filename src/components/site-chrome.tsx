@@ -10,10 +10,11 @@ export function SiteHeader() {
         <Link href="/" aria-label={`${site.name} home`}>
           <Logo light />
         </Link>
-        <nav aria-label="Main" className="hidden items-center gap-7 text-sm text-slate-300 md:flex">
+        <nav aria-label="Main" className="hidden items-center gap-6 text-sm text-slate-300 lg:flex">
           <Link href="/creators" className="hover:text-white">For creators</Link>
           <Link href="/brands" className="hover:text-white">For brands</Link>
-          <Link href="/why-switch" className="hover:text-white">Why switch</Link>
+          <Link href="/tools" className="hover:text-white">Free tools</Link>
+          <Link href="/guides" className="hover:text-white">Guides</Link>
           <Link href="/pricing" className="hover:text-white">Pricing</Link>
         </nav>
         <div className="flex items-center gap-2">
@@ -21,9 +22,19 @@ export function SiteHeader() {
           <Link href="/login" className="hidden rounded-xl px-3 py-2 text-sm font-medium text-slate-300 hover:text-white sm:inline-flex">
             Sign in
           </Link>
-          <ButtonLink href="/join" className="!px-3.5 !py-2">Request invite</ButtonLink>
+          <span data-magnetic className="inline-flex"><ButtonLink href="/join" className="!px-3.5 !py-2">Request invite</ButtonLink></span>
         </div>
       </div>
+      <nav aria-label="Sections" className="border-t border-white/10 lg:hidden">
+        <ul className="container-page flex gap-5 overflow-x-auto py-2.5 text-sm whitespace-nowrap text-slate-300 [scrollbar-width:none]">
+          <li><Link href="/creators" className="hover:text-white">Creators</Link></li>
+          <li><Link href="/brands" className="hover:text-white">Brands</Link></li>
+          <li><Link href="/tools" className="hover:text-white">Free tools</Link></li>
+          <li><Link href="/guides" className="hover:text-white">Guides</Link></li>
+          <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
+          <li><Link href="/why-switch" className="hover:text-white">Why switch</Link></li>
+        </ul>
+      </nav>
     </header>
   );
 }
@@ -32,7 +43,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-line bg-white">
-      <div className="container-page grid gap-10 py-12 md:grid-cols-4">
+      <div className="container-page grid gap-10 py-12 sm:grid-cols-2 md:grid-cols-5">
         <div className="space-y-3 md:col-span-2">
           <Logo />
           <p className="max-w-sm text-sm text-muted">{site.tagline} An invite-only network for creators, brands and local creative communities in India.</p>
@@ -48,6 +59,17 @@ export function SiteFooter() {
             <li><Link href="/about" className="hover:text-ink">About &amp; founder</Link></li>
             <li><a href={site.xUrl} target="_blank" rel="noopener noreferrer me" className="hover:text-ink">Follow @{site.xHandle} on X</a></li>
             <li><Link href="/contact" className="hover:text-ink">Contact</Link></li>
+          </ul>
+        </nav>
+        <nav aria-label="Resources" className="space-y-2 text-sm">
+          <p className="font-semibold">Free resources</p>
+          <ul className="space-y-2 text-muted">
+            <li><Link href="/tools" className="hover:text-ink">All free tools</Link></li>
+            <li><Link href="/tools/rate-calculator" className="hover:text-ink">Creator rate calculator</Link></li>
+            <li><Link href="/tools/gst-invoice-generator" className="hover:text-ink">GST invoice generator</Link></li>
+            <li><Link href="/tools/collab-agreement-generator" className="hover:text-ink">Collaboration agreement</Link></li>
+            <li><Link href="/tools/ad-disclosure-checker" className="hover:text-ink">Ad disclosure checker</Link></li>
+            <li><Link href="/guides" className="hover:text-ink">Guides</Link></li>
           </ul>
         </nav>
         <nav aria-label="Legal" className="space-y-2 text-sm">

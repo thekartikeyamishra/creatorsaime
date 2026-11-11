@@ -2,6 +2,7 @@ import Link from "next/link";
 import { JsonLd } from "@/components/json-ld";
 import { Badge, ButtonLink } from "@/components/ui";
 import { COHORT_CITIES, site } from "@/lib/config";
+import { TOOLS } from "@/lib/tools-catalog";
 
 export const metadata = { alternates: { canonical: "/", languages: { "en-IN": "/", "hi-IN": "/hi" } } };
 
@@ -57,7 +58,7 @@ export default function HomePage() {
       />
 
       {/* Hero */}
-      <section className="grid-glow relative overflow-hidden bg-ink text-white">
+      <section data-spotlight className="grid-glow relative overflow-hidden bg-ink text-white">
         <div className="container-page grid gap-12 py-20 sm:py-28 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <Badge tone="teal">Invite-only · First cohort now forming</Badge>
@@ -68,8 +69,8 @@ export default function HomePage() {
               A growing network of creators, brands and communities building real opportunities together — verified, fairly paid and local first.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/join?role=creator" className="!px-6 !py-3 text-base">Join as a Creator</ButtonLink>
-              <ButtonLink href="/join?role=brand" variant="light" className="!px-6 !py-3 text-base">Find Your Next Creator</ButtonLink>
+              <span data-magnetic className="inline-flex"><ButtonLink href="/join?role=creator" className="!px-6 !py-3 text-base">Join as a Creator</ButtonLink></span>
+              <span data-magnetic className="inline-flex"><ButtonLink href="/join?role=brand" variant="light" className="!px-6 !py-3 text-base">Find Your Next Creator</ButtonLink></span>
             </div>
             <p className="mt-5 text-sm text-slate-400">
               Organise creators in your city?{" "}
@@ -78,6 +79,29 @@ export default function HomePage() {
           </div>
 
           <PassportPreview />
+        </div>
+      </section>
+
+      {/* Free tools — instant value before any sign-up */}
+      <section className="border-b border-line bg-white" aria-labelledby="free-tools">
+        <div className="container-page py-10">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 id="free-tools" className="text-lg font-semibold tracking-tight">Free tools — use them now, no sign-up</h2>
+            <Link href="/tools" className="text-sm font-medium text-brand hover:underline">All tools →</Link>
+          </div>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {TOOLS.slice(0, 4).map((t) => (
+              <li key={t.slug} data-reveal>
+                <Link href={`/tools/${t.slug}`} data-tilt className="flex h-full items-start gap-3 rounded-2xl bg-paper p-4 ring-1 ring-line hover:ring-slate-300">
+                  <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-lg bg-ink text-sm font-semibold text-white">{t.emoji}</span>
+                  <span>
+                    <span className="block text-sm font-semibold">{t.name.replace(/ \(.*\)$/, "")}</span>
+                    <span className="mt-1 block text-xs leading-5 text-muted">{t.blurb}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

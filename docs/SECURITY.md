@@ -23,3 +23,10 @@
 - Enable **MFA (TOTP)** in Firebase Auth for admin accounts and set `ADMIN_REQUIRE_MFA=true`.
 - File uploads are disabled (storage rules deny all) until signed-URL + malware scanning lands in Stage 2.
 - Turn on Firestore **PITR + scheduled exports** and test a restore.
+
+## Third-party scripts (v0.9)
+
+- The only third-party script on public pages is Google AdSense, and only on `/tools/*` and `/guides/*`. It never loads on `/dashboard`, `/admin`, sign-in, checkout or deal pages (`isAdEligiblePath`, unit-tested).
+- Any script on our origin can technically read same-origin browser storage. Mitigations: ads never run on authenticated screens; every sensitive action is authorised server-side with ID-token **revocation checks**; admin MFA is supported (`ADMIN_REQUIRE_MFA`); sessions can be revoked.
+- `NEXT_PUBLIC_ADS_ENABLED=false` removes the ad script everywhere at the next deploy.
+- Free tools are pure client-side functions: no network calls and no AI provider, so they keep working if any vendor is down, and they cannot be abused to run up our costs.

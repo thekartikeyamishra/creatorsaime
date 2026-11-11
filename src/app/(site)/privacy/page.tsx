@@ -47,15 +47,34 @@ export default function PrivacyPage() {
       <h2>4. Who processes it</h2>
       <p>
         We use Google Firebase / Google Cloud (authentication, database and hosting infrastructure), Razorpay (payments) and, only if you opt in, Meta&apos;s
-        WhatsApp Business Platform (service messages) as processors. Data may be stored on servers outside India; we rely
+        WhatsApp Business Platform (service messages) as processors. Google AdSense serves ads on our public tools and guides as an independent controller (see section 5). Data may be stored on servers outside India; we rely
         on the processor&apos;s contractual and technical safeguards. We will disclose data to authorities only where legally required.
       </p>
 
-      <h2>5. Storage, cookies and local storage</h2>
+      <h2>5. Storage, cookies and advertising</h2>
       <p>
-        We do not use advertising or analytics cookies. When you sign in, Firebase stores an authentication session in your browser&apos;s local storage / IndexedDB so you stay
-        signed in. Our installable app (PWA) caches public pages on your device for offline use.
+        When you sign in, Firebase stores an authentication session in your browser&apos;s local storage / IndexedDB so you stay signed in. Our installable app (PWA) caches public
+        pages on your device for offline use. Our free tools save what you type only in your own browser so you can continue later; it is never sent to us.
       </p>
+      <h3>Advertising on free tools and guides</h3>
+      <p>
+        To keep the free tools and guides free, we show ads from Google AdSense on those public pages only (pages under <Link href="/tools">/tools</Link> and{" "}
+        <Link href="/guides">/guides</Link>). We never show ads inside your account, on deal pages, on sign-up or on payment pages, and we never share your account data with
+        advertisers.
+      </p>
+      <ul>
+        <li>
+          Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites. Google&apos;s use of advertising cookies
+          enables it and its partners to serve ads to you based on your visit to our site and/or other sites on the Internet.
+        </li>
+        <li>
+          You may opt out of personalised advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">Google Ads Settings</a>, and
+          learn more at <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">How Google uses information from sites that use its services</a>.
+          You can also opt out of some third-party vendors&apos; use of cookies at <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">aboutads.info</a>.
+        </li>
+        <li>Visitors from the EEA, the UK and Switzerland are asked for consent through a Google-certified consent message before personalised ads are shown.</li>
+      </ul>
+      <p>We do not use other advertising or tracking cookies.</p>
 
       <h2>6. Retention</h2>
       <ul>

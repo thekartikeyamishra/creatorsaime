@@ -47,6 +47,15 @@ v0.4 turns everyday Deal Desk usage into data nobody else has. See **docs/MOATS.
 
 Live at **https://creatorsai.me** · built in public by Kartikeya Mishra — follow [@KartikeyahereX](https://x.com/KartikeyahereX)
 
+## What's new in v0.9
+
+- **5 free public tools** (`/tools`): creator rate calculator, GST invoice generator, collaboration agreement generator, ASCI ad-disclosure checker, engagement rate calculator — private (run in the browser), no sign-up, progress saved, each ending in a sign-up step.
+- **6 sourced long-form guides** (`/guides`) with author, dates, sources and Article/FAQ/Breadcrumb schema.
+- **Google AdSense, policy-first:** verification meta tag, `ads.txt`, ads only on tools and guides, lazy-loaded, labelled, no layout shift, kill switch. See `docs/ADSENSE.md`.
+- **Micro-interactions:** cursor spotlight, magnetic buttons, tilt cards and scroll reveals — dependency-free, disabled on touch and for reduced motion.
+- **SEO:** sitemap includes tools and guides, header/footer/mobile internal links, privacy policy ad-cookie disclosure. See `docs/SEO-PERFORMANCE.md`.
+- **Legal & ownership summary:** `docs/LEGAL-OWNERSHIP.md`.
+
 ## What's new in v0.8
 
 - **Admin → Setup check** (`/admin/setup`): every integration at a glance (Firebase, Razorpay, WhatsApp, email, cron, Node, MFA) plus read-only live connection tests. Never displays secret values.

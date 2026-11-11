@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { site } from "@/lib/config";
+import { ADSENSE_CLIENT } from "@/lib/ads";
 import { ServiceWorker } from "@/components/service-worker";
 import { LocaleProvider } from "@/components/locale-provider";
 import "./globals.css";
@@ -26,6 +27,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } : undefined,
   formatDetection: { telephone: false },
+  // AdSense site verification (the ad script itself loads only on /tools and /guides).
+  other: { "google-adsense-account": ADSENSE_CLIENT },
 };
 
 export const viewport: Viewport = {

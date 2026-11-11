@@ -17,7 +17,7 @@ export type CheckItem = {
 };
 
 export type CheckGroup = {
-  id: "core" | "firebase" | "payments" | "whatsapp" | "email" | "cron" | "runtime";
+  id: "core" | "firebase" | "payments" | "whatsapp" | "email" | "cron" | "ads" | "runtime";
   title: string;
   /** What breaks for users if this group is not ready. */
   impact: string;
@@ -141,6 +141,25 @@ export function setupReport(env: Env, nodeVersion = "22.0.0"): SetupReport {
   // ── Cron ──────────────────────────────────────────────────
   const cronItems = [secret(env, "CRON_SECRET", "Cron secret", { required: true, min: 16, hint: "Random 16+ chars. Vercel sends it automatically to /api/cron/*." })];
 
+  // ── Ads (AdSense on /tools and /guides only) ─────────────
+  const client = (env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-4557897331416844").trim();
+  const adsOff = env.NEXT_PUBLIC_ADS_ENABLED === "false";
+  const slots = ["NEXT_PUBLIC_ADSENSE_SLOT_TOOL", "NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE", "NEXT_PUBLIC_ADSENSE_SLOT_MULTIPLEX"];
+  const slotCount = slots.filter((k) => /^\d{6,20}$/.test((env[k] ?? "").trim())).length;
+  const badSlot = slots.find((k) => has(env[k]) && !/^\d{6,20}$/.test(env[k]!.trim()));
+  const adItems: CheckItem[] = adsOff
+    ? [{ key: "NEXT_PUBLIC_ADS_ENABLED", label: "Ads switched off", required: false, status: "off" }]
+    : [
+        /^ca-pub-\d{10,20}$/.test(client)
+          ? { key: "NEXT_PUBLIC_ADSENSE_CLIENT", label: "Publisher ID (also in /ads.txt)", required: false, status: "ok" }
+          : { key: "NEXT_PUBLIC_ADSENSE_CLIENT", label: "Publisher ID", required: false, status: "invalid", hint: "Format: ca-pub-0000000000000000" },
+        badSlot
+          ? { key: badSlot, label: "Ad unit IDs", required: false, status: "invalid", hint: "Ad unit IDs are numbers only (AdSense → Ads → By ad unit)." }
+          : slotCount === 0
+            ? { key: "NEXT_PUBLIC_ADSENSE_SLOT_TOOL", label: "Ad units", required: false, status: "warn", hint: "No ad units yet — after approval create Display, In-article and Multiplex units and paste their IDs." }
+            : { key: "NEXT_PUBLIC_ADSENSE_SLOT_TOOL", label: `Ad units (${slotCount}/3 configured)`, required: false, status: slotCount === 3 ? "ok" : "warn", hint: "Configure all three placements for full coverage." },
+      ];
+
   // ── Runtime ───────────────────────────────────────────────
   const major = Number(nodeVersion.replace(/^v/, "").split(".")[0]);
   const runtime: CheckItem[] = [
@@ -159,6 +178,7 @@ export function setupReport(env: Env, nodeVersion = "22.0.0"): SetupReport {
     { id: "whatsapp", title: "WhatsApp", impact: "OTP, payment reminders and digests on WhatsApp", items: waItems },
     { id: "email", title: "Email (Resend)", impact: "Email digests", items: emailItems },
     { id: "cron", title: "Scheduled jobs", impact: "Daily digests, reminders and Rate Index refresh", items: cronItems },
+    { id: "ads", title: "Google AdSense", impact: "Ad revenue from free tools and guides", items: adItems },
     { id: "runtime", title: "Runtime & security", impact: "Stability and admin safety", items: runtime },
   ]);
 }
