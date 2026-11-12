@@ -38,6 +38,11 @@ export const C = {
   pods: "pods",
   // v0.6
   whatsappMessages: "whatsappMessages",
+  // v0.13 growth loops
+  memberRefCodes: "memberRefCodes",
+  referrals: "referrals",
+  referralStats: "referralStats",
+  reviews: "reviews",
 } as const;
 
 export function profileCollection(role: Role): string {

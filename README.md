@@ -47,6 +47,13 @@ v0.4 turns everyday Deal Desk usage into data nobody else has. See **docs/MOATS.
 
 Live at **https://creatorsai.me** · built in public by Kartikeya Mishra — follow [@KartikeyahereX](https://x.com/KartikeyahereX)
 
+## What's new in v0.13 — growth loops
+
+- **Referrals** (Dashboard → Invite & earn): share link `/r/<code>`, brands joining get **14 days of Growth free**; referrers are rewarded only after a verified first payment or a both-sides-confirmed deal — brands earn Growth days, creators earn Ambassador status. No cash cost, capped, audit-logged. Every client deal link now carries the creator's invite.
+- **Verified reviews:** only for deals both sides confirmed, double-blind for 14 days, shown on public profiles; reporting + Admin → Reviews moderation.
+- **Recurring revenue:** trial status on the plan page; renewal reminders at 7 days, 1 day and on expiry (daily job).
+- Privacy Policy and Terms updated (policy version 2026-11-12). Strategy & data model: `docs/GROWTH-LOOPS.md`. **Deploy the new Firestore indexes.**
+
 ## What's new in v0.12
 
 - **Crash-proof backend:** Firestore uses HTTPS (`preferRest`) instead of gRPC streams on serverless; stray promise rejections are logged instead of crashing the instance (`src/instrumentation.ts`).

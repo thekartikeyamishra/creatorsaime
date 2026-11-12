@@ -7,6 +7,7 @@ import { TermsEditor, Textish, termsFromDeal, toTermsPayload, type TermsValue } 
 import { PodPanel } from "@/components/pod-panel";
 import { useLocale } from "@/components/locale-provider";
 import { statusLabel } from "@/lib/i18n";
+import { ReviewPanel } from "@/components/review-panel";
 import { Badge, Button, Card, Field, Input, Notice, Select, Spinner, cx } from "@/components/ui";
 import { api, ApiClientError } from "@/lib/client/api";
 import { useAuth } from "@/lib/client/auth-context";
@@ -110,6 +111,7 @@ export default function DealDetailPage() {
 
       {error && <Notice tone="error">{error}</Notice>}
       {notice && <Notice tone="success">{notice}</Notice>}
+      {deal.verifiedCompletion && <ReviewPanel endpoint={`/api/deals/${deal.id}/review`} />}
       {deal.status === "cancelled" && <Notice tone="warn">Cancelled{deal.cancelReason ? `: ${deal.cancelReason}` : ""}.</Notice>}
 
       {/* Agreement */}

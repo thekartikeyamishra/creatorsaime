@@ -390,3 +390,13 @@ export const podDealActionSchema = z.discriminatedUnion("action", [
   }),
   z.object({ action: z.literal("confirm_payout"), payoutId: z.string().regex(/^[A-Za-z0-9]{6,24}$/) }),
 ]);
+
+
+// ── v0.13 reviews ──
+export const reviewSchema = z.object({
+  rating: z.number().int().min(1, "Choose a rating").max(5),
+  tags: z.array(z.string().max(40)).max(3).optional().default([]),
+  text: z.string().max(400).optional().default(""),
+});
+export type ReviewInput = z.infer<typeof reviewSchema>;
+export const linkReviewSchema = reviewSchema.extend({ name: z.string().trim().min(2, "Enter your name").max(80) });

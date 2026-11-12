@@ -11,6 +11,7 @@ import { daysLeft, formatPaise, PRODUCTS, type ProductId } from "@/lib/plans";
 type PlanState = {
   tier: "free" | "growth";
   expiresAt: string | null;
+  trial?: boolean;
   paymentsEnabled: boolean;
   orders: Array<{ id: string; productId: ProductId; amountPaise: number; receiptNo: string; paidAt: string }>;
 };
@@ -120,14 +121,14 @@ export default function PlanPage() {
       <Card className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm text-muted">Current plan</p>
-          <p className="text-2xl font-semibold">{state.tier === "growth" ? "Growth" : "Free"}</p>
+          <p className="text-2xl font-semibold">{state.tier === "growth" ? (state.trial ? "Growth · free trial" : "Growth") : "Free"}</p>
           {state.tier === "growth" && expiresMs && (
             <p className="text-sm text-muted">
               Active until {new Date(expiresMs).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })} · {left} day{left === 1 ? "" : "s"} left
             </p>
           )}
         </div>
-        {state.tier === "growth" ? <Badge tone="green">Active</Badge> : <Badge>Free</Badge>}
+        {state.tier === "growth" ? <Badge tone={state.trial ? "amber" : "green"}>{state.trial ? "Trial" : "Active"}</Badge> : <Badge>Free</Badge>}
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-3">

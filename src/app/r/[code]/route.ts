@@ -1,46 +1,17 @@
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
-import { adminDb, isAdminConfigured } from "@/lib/firebase/admin";
-import { site } from "@/lib/config";
-import { C } from "@/lib/server/collections";
-import { keyedHash } from "@/lib/server/crypto";
-import { clientIp } from "@/lib/server/http";
+import { NextResponse } from "next/server";
+import { REF_CODE_RE, REFERRAL } from "@/lib/referrals";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-// Link-preview fetchers (WhatsApp, Instagram, etc.) and crawlers must not inflate click counts.
-const BOT_RE = /bot|crawl|spider|preview|facebookexternalhit|whatsapp|telegram|slack|discord|twitter|linkedin|skype|headless|curl|wget|python|axios|node-fetch/i;
-
-function redirect(to: string): Response {
-  return new Response(null, { status: 302, headers: { Location: to, "Cache-Control": "no-store", "Referrer-Policy": "no-referrer-when-downgrade" } });
-}
-
-/** Tracked short link: counts unique human clicks (per visitor per day), then redirects. */
-export async function GET(req: Request, { params }: { params: Promise<{ code: string }> }): Promise<Response> {
-  const { code } = await params;
-  if (!/^[0-9A-HJKMNP-TV-Z]{7}$/.test(code) || !isAdminConfigured()) return redirect(site.url);
-  const db = adminDb();
-  let destination: string | null = null;
-  let dealId: string | null = null;
-  try {
-    const link = await db.collection(C.trackingLinks).doc(code).get();
-    destination = (link.get("destination") as string | undefined) || null;
-    dealId = (link.get("dealId") as string | undefined) || null;
-  } catch (err) {
-    console.error("[r] lookup failed", err);
-  }
-  if (!destination || !dealId || !/^https?:\/\//i.test(destination)) return redirect(site.url);
-
-  const ua = req.headers.get("user-agent") || "";
-  if (ua && !BOT_RE.test(ua)) {
-    try {
-      const day = new Date().toISOString().slice(0, 10);
-      const key = keyedHash(`${code}:${clientIp(req)}:${ua.slice(0, 120)}:${day}`).slice(0, 40);
-      await db.collection(C.clickDedupe).doc(key).create({ expiresAt: Timestamp.fromMillis(Date.now() + 2 * 86_400_000) });
-      await db.collection(C.deals).doc(dealId).update({ "tracking.clicks": FieldValue.increment(1) });
-    } catch {
-      // Duplicate click today (ALREADY_EXISTS) or transient failure — never block the redirect.
-    }
-  }
-  return redirect(destination);
+/**
+ * Share link: creatorsai.me/r/abcd2345. Remembers the referrer in a first-party, httpOnly cookie for
+ * 30 days (read only by our sign-up API — not readable by scripts) and shows a personal invite page.
+ */
+export function GET(req: Request, { params }: { params: Promise<{ code: string }> }) {
+  return params.then(({ code }) => {
+    const c = code.toLowerCase();
+    const url = new URL(req.url);
+    if (!REF_CODE_RE.test(c)) return NextResponse.redirect(new URL("/signup", url), 302);
+    const res = NextResponse.redirect(new URL(`/invite/${c}`, url), 302);
+    res.cookies.set(REFERRAL.cookie, c, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: REFERRAL.attributionDays * 86_400 });
+    return res;
+  });
 }

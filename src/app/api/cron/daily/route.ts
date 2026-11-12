@@ -12,6 +12,8 @@ import { C } from "@/lib/server/collections";
 import { safeEqual } from "@/lib/server/crypto";
 import { toClientDeal, type DealDoc } from "@/lib/server/deals";
 import { sendEmail } from "@/lib/server/notify";
+import { qualifyPendingReferrals } from "@/lib/server/referrals";
+import { sendRenewalReminders } from "@/lib/server/renewals";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -138,5 +140,9 @@ export async function GET(req: Request): Promise<Response> {
     }
   }
 
-  return Response.json({ ok: true, today, scanned, notified, emailed, waDigests, waReminders });
+  // Growth loops: qualify referrals whose event happened; prepaid renewal reminders (each isolated).
+  const referralsQualified = await qualifyPendingReferrals().catch((e) => (console.error("[cron] referrals", e), 0));
+  const renewalReminders = await sendRenewalReminders().catch((e) => (console.error("[cron] renewals", e), 0));
+
+  return Response.json({ ok: true, today, scanned, notified, emailed, waDigests, waReminders, referralsQualified, renewalReminders });
 }

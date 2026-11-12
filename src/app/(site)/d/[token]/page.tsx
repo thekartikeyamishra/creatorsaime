@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DealLinkActions } from "@/components/deal-link-actions";
+import { ReviewPanel } from "@/components/review-panel";
+import { adminDb } from "@/lib/firebase/admin";
+import { C } from "@/lib/server/collections";
 import { Badge, Card } from "@/components/ui";
 import { COMPENSATION_LABELS } from "@/lib/config";
 import { balance, formatInr, received } from "@/lib/deals";
@@ -24,6 +27,10 @@ export default async function DealLinkPage({ params, searchParams }: { params: P
   const them = side === "creator" ? deal.brandSide : deal.creatorSide;
   const accepted = deal.acceptance[side];
   const completed = deal.completion[side];
+  // The member who shared this link gets credit if the client joins (their referral link, if they have one).
+  const sharerUid = them.uid;
+  const sharerCode = sharerUid ? await adminDb().collection(C.users).doc(sharerUid).get().then((u) => (u.get("refCode") as string | undefined) ?? null).catch(() => null) : null;
+  const joinHref = sharerCode ? `/r/${sharerCode}` : `/signup?role=${side === "brand" ? "brand" : "creator"}`;
 
   return (
     <section className="container-page max-w-3xl py-12 sm:py-16">
@@ -84,10 +91,16 @@ export default async function DealLinkPage({ params, searchParams }: { params: P
           />
         )}
       </Card>
+      {deal.verifiedCompletion && !me.uid && (
+        <div className="mt-6">
+          <ReviewPanel endpoint={`/api/d/${token}/review`} auth={false} askName={!me.name} defaultName={me.name} />
+        </div>
+      )}
       <div className="mt-8 rounded-2xl bg-ink p-6 text-white">
         <p className="font-semibold">{t("link.ctaTitle")}</p>
         <p className="mt-1 text-sm text-slate-300">{t("link.ctaBody")}</p>
-        <a href={`/join?role=${side === "brand" ? "brand" : "creator"}`} className="mt-4 inline-block rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ink">{t("link.ctaBtn")}</a>
+        <a href={joinHref} className="mt-4 inline-block rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ink">{t("link.ctaBtn")}</a>
+        {side === "brand" && sharerCode && <p className="mt-3 text-xs text-slate-400">Joining through {them.name}&apos;s invite gives your business 14 days of Growth free.</p>}
       </div>
     </section>
   );

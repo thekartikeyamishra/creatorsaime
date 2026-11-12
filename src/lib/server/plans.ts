@@ -21,20 +21,30 @@ export type OrderDoc = {
   buyer: { name: string; email: string };
 };
 
-export async function getTier(uid: string): Promise<{ tier: Tier; expiresAt: number | null }> {
+export async function getTier(uid: string): Promise<{ tier: Tier; expiresAt: number | null; trial: boolean }> {
   const snap = await adminDb().collection(C.subscriptions).doc(uid).get();
   const exp = snap.exists ? ((snap.get("expiresAt") as Timestamp | undefined)?.toMillis() ?? null) : null;
-  return { tier: tierAt(exp), expiresAt: exp };
+  return { tier: tierAt(exp), expiresAt: exp, trial: snap.exists && snap.get("trial") === true };
 }
 
 /**
  * Idempotent fulfilment. Safe to call from both the checkout callback and the webhook,
  * in any order, any number of times: only the first call changes anything.
  */
+/** After a successful payment: qualify the buyer's referral (idempotent, never blocks or fails the payment). */
+export async function afterPaid(uid: string): Promise<void> {
+  try {
+    const { qualifyReferral } = await import("./referrals");
+    await qualifyReferral(uid);
+  } catch (err) {
+    console.error("[plans] referral qualification failed", err);
+  }
+}
+
 export async function fulfillOrder(orderId: string, paymentId: string, via: "checkout" | "webhook", paidAmountPaise?: number): Promise<{ fulfilled: boolean; productId?: ProductId }> {
   const db = adminDb();
   const orderRef = db.collection(C.orders).doc(orderId);
-  return db.runTransaction(async (tx) => {
+  const result = await db.runTransaction(async (tx) => {
     const snap = await tx.get(orderRef);
     if (!snap.exists) return { fulfilled: false };
     const order = snap.data() as OrderDoc;
@@ -57,7 +67,7 @@ export async function fulfillOrder(orderId: string, paymentId: string, via: "che
     if (product.kind === "plan" && product.days) {
       const current = sub.exists ? ((sub.get("expiresAt") as Timestamp | undefined)?.toMillis() ?? null) : null;
       const expiresAt = Timestamp.fromMillis(extendExpiry(current, product.days));
-      tx.set(subRef, { uid: order.uid, tier: "growth", expiresAt, lastOrderId: orderId, updatedAt: now, schemaVersion: SCHEMA_VERSION }, { merge: true });
+      tx.set(subRef, { uid: order.uid, tier: "growth", trial: false, expiresAt, lastOrderId: orderId, updatedAt: now, schemaVersion: SCHEMA_VERSION }, { merge: true });
       notifyIn(tx, order.uid, {
         type: "plan_activated",
         title: "Growth plan active",
@@ -81,6 +91,8 @@ export async function fulfillOrder(orderId: string, paymentId: string, via: "che
       });
     }
     auditIn(tx, { actorUid: order.uid, actorRole: "user", action: `order.paid.${order.productId}`, targetType: "order", targetId: orderId, meta: { via, amountPaise: order.amountPaise } });
-    return { fulfilled: true, productId: order.productId };
+    return { fulfilled: true, productId: order.productId, uid: order.uid };
   });
+  if (result.fulfilled && "uid" in result && result.uid) await afterPaid(result.uid);
+  return { fulfilled: result.fulfilled, productId: result.productId };
 }

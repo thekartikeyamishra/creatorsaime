@@ -45,3 +45,14 @@ export function daysLeft(expiresAtMs: number | null | undefined, nowMs: number =
   if (!expiresAtMs || expiresAtMs <= nowMs) return 0;
   return Math.ceil((expiresAtMs - nowMs) / 86_400_000);
 }
+
+export type RenewalStage = "d7" | "d1" | "ended" | null;
+
+/** Which renewal reminder is due today for a term ending at `expiresAtMs` (one per stage). */
+export function renewalStage(expiresAtMs: number, nowMs: number = Date.now()): RenewalStage {
+  const d = (expiresAtMs - nowMs) / 86_400_000;
+  if (d <= 0 && d > -1) return "ended";
+  if (d > 0 && d <= 1) return "d1";
+  if (d > 6 && d <= 7) return "d7";
+  return null;
+}

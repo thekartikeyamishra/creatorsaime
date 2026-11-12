@@ -6,6 +6,7 @@ import { auditIn } from "@/lib/server/audit";
 import { requireAuth } from "@/lib/server/auth";
 import { C } from "@/lib/server/collections";
 import { createMemberInTx } from "@/lib/server/members";
+import { clearRefCookie, readAttribution, refCodeFromRequest, writeAttribution } from "@/lib/server/referrals";
 import { sha256 } from "@/lib/server/crypto";
 import { ApiError, assertSameOrigin, json, readJson, route } from "@/lib/server/http";
 import { enforceRateLimit, RULES } from "@/lib/server/rate-limit";
@@ -24,6 +25,7 @@ export const POST = route(async (req) => {
   const inviteRef = db.collection(C.invites).doc(sha256(code));
   const userRef = db.collection(C.users).doc(ctx.uid);
 
+  const refCode = refCodeFromRequest(req);
   const result = await db.runTransaction(async (tx) => {
     const [invite, existingUser] = await Promise.all([tx.get(inviteRef), tx.get(userRef)]);
     if (existingUser.exists) throw new ApiError(409, "already_member", "This account is already a member.");
@@ -48,6 +50,7 @@ export const POST = route(async (req) => {
     const name = (w.name as string | undefined) || ctx.token.name || ctx.email!.split("@")[0]!;
 
     const city = (w.city as string | undefined) ?? "";
+    const attribution = await readAttribution(tx, db, refCode, ctx.uid, inv.role);
     const { handle } = await createMemberInTx(tx, db, {
       uid: ctx.uid,
       email: ctx.email!,
@@ -72,8 +75,9 @@ export const POST = route(async (req) => {
       targetId: ctx.uid,
       meta: { role: inv.role },
     });
+    writeAttribution(tx, db, attribution, ctx.uid, inv.role, name);
     return { role: inv.role, handle };
   });
 
-  return json({ ok: true, ...result }, 201);
+  return json({ ok: true, ...result }, { status: 201, headers: refCode ? { "Set-Cookie": clearRefCookie } : undefined });
 });

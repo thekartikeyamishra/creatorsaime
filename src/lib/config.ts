@@ -18,7 +18,7 @@ export const site = {
 } as const;
 
 /** Version stamp recorded with every consent record. Bump when the privacy policy changes materially. */
-export const POLICY_VERSION = "2026-11-11";
+export const POLICY_VERSION = "2026-11-12";
 
 /** Data schema version written on every document we create. */
 export const SCHEMA_VERSION = 1;

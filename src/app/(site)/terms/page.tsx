@@ -48,6 +48,14 @@ export default function TermsPage() {
       <p>
         We do not guarantee invites, opportunities, earnings, views, sales or campaign outcomes. The Service is provided &ldquo;as is&rdquo; to the extent permitted by law.
       </p>
+      <h2>7A. Referrals and reviews</h2>
+      <ul>
+        <li><strong>Referral rewards</strong> are platform benefits (Growth plan days for brands; Ambassador status for creators and professionals). They have no cash value, cannot be transferred or sold, and are limited to 12 rewards per member per calendar year.</li>
+        <li>A referral counts only when the person you invited joins through your link and later makes their first payment (brands) or completes a deal confirmed by both sides (creators and professionals). Self-referrals, duplicate or fake accounts, and spam (including unsolicited bulk messages) are not allowed; we may reverse rewards and suspend accounts involved.</li>
+        <li>A brand that joins through a member&apos;s link receives a one-time free Growth trial. Trials do not renew automatically and nothing is charged when they end.</li>
+        <li><strong>Reviews</strong> are possible only for deals both sides confirmed. They must be honest, about that collaboration, and free of links, contact details, abuse and confidential information. Offering or accepting anything in exchange for a review — or for changing one — is not allowed. We may hide reviews that break these terms or our Community Guidelines; we do not remove reviews just because they are negative.</li>
+      </ul>
+
       <h2>8. Liability</h2>
       <p>
         To the extent permitted by law, we are not liable for indirect or consequential losses, and our total liability for any claim relating to the free Service is

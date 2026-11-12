@@ -16,7 +16,11 @@ export type NotificationType =
   | "managed_pilot_received"
   | "pod_invite"
   | "pod_hired"
-  | "payout_recorded";
+  | "payout_recorded"
+  | "referral_joined"
+  | "referral_rewarded"
+  | "review_received"
+  | "plan_expiring";
 
 export type Notice = { type: NotificationType; title: string; body?: string; href?: string };
 

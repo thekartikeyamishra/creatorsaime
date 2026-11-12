@@ -5,6 +5,8 @@ import { requireAuth } from "@/lib/server/auth";
 import { C } from "@/lib/server/collections";
 import { ApiError, assertSameOrigin, clientIp, json, readJson, route } from "@/lib/server/http";
 import { createMemberInTx, recordConsentInTx } from "@/lib/server/members";
+import { clearRefCookie, readAttribution, refCodeFromRequest, writeAttribution } from "@/lib/server/referrals";
+import { REFERRAL } from "@/lib/referrals";
 import { enforceRateLimit, RULES } from "@/lib/server/rate-limit";
 
 export const runtime = "nodejs";
@@ -26,9 +28,11 @@ export const POST = route(async (req) => {
   const db = adminDb();
   const userRef = db.collection(C.users).doc(ctx.uid);
 
+  const refCode = refCodeFromRequest(req);
   const result = await db.runTransaction(async (tx) => {
     const existing = await tx.get(userRef);
     if (existing.exists) throw new ApiError(409, "already_member", "This account is already set up.");
+    const attribution = await readAttribution(tx, db, refCode, ctx.uid, input.role);
     const { handle } = await createMemberInTx(tx, db, {
       uid: ctx.uid,
       email: ctx.email!,
@@ -41,8 +45,9 @@ export const POST = route(async (req) => {
       joinedVia: "open",
     });
     recordConsentInTx(tx, db, ctx.uid, input.marketingConsent, "signup_form");
+    writeAttribution(tx, db, attribution, ctx.uid, input.role, input.name);
     auditIn(tx, { actorUid: ctx.uid, actorRole: "user", action: "account.registered", targetType: "user", targetId: ctx.uid, meta: { role: input.role } });
-    return { role: input.role, handle };
+    return { role: input.role, handle, trialDays: attribution?.trial ? REFERRAL.brandTrialDays : 0 };
   });
-  return json({ ok: true, ...result }, 201);
+  return json({ ok: true, ...result }, { status: 201, headers: refCode ? { "Set-Cookie": clearRefCookie } : undefined });
 });

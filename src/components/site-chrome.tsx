@@ -46,7 +46,7 @@ export function SiteFooter() {
       <div className="container-page grid gap-10 py-12 sm:grid-cols-2 md:grid-cols-5">
         <div className="space-y-3 md:col-span-2">
           <Logo />
-          <p className="max-w-sm text-sm text-muted">{site.tagline} An invite-only network for creators, brands and local creative communities in India.</p>
+          <p className="max-w-sm text-sm text-muted">{site.tagline} A trusted network for creators, brands and local creative communities in India — free for creators.</p>
         </div>
         <nav aria-label="Product" className="space-y-2 text-sm">
           <p className="font-semibold">Network</p>

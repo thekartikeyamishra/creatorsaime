@@ -3,6 +3,8 @@ import { cache } from "react";
 import { adminDb, isAdminConfigured } from "@/lib/firebase/admin";
 import { handleSchema } from "@/lib/schemas";
 import type { Reliability } from "@/lib/insights";
+import { ambassadorLevel } from "@/lib/referrals";
+import type { PublicReview } from "@/lib/reviews";
 import { C, profileCollection } from "./collections";
 import type { UserDoc } from "./auth";
 
@@ -26,6 +28,8 @@ export type PublicPassport = {
   signals: PublicTrustSignal[];
   memberSince: string | null;
   reliability: Reliability | null;
+  reviews: PublicReview[];
+  ambassador: string | null;
 };
 
 /**
@@ -46,8 +50,26 @@ export const getPublicPassport = cache(async (rawHandle: string): Promise<Public
   const p = await db.collection(profileCollection(user.role)).doc(uid).get();
   if (!p.exists || p.get("isPublic") !== true) return null;
   const prof = p.data()!;
-  const rel = await db.collection(C.reliability).doc(uid).get();
-  const trust = await db.collection(C.trustSignals).where("uid", "==", uid).where("public", "==", true).limit(50).get();
+  // Independent reads in parallel (no request waterfall).
+  const [rel, trust, reviewSnap, refStats] = await Promise.all([
+    db.collection(C.reliability).doc(uid).get(),
+    db.collection(C.trustSignals).where("uid", "==", uid).where("public", "==", true).limit(50).get(),
+    db.collection(C.reviews).where("subjectUid", "==", uid).where("hidden", "==", false).orderBy("createdAt", "desc").limit(40).get().catch(() => null),
+    db.collection(C.referralStats).doc(uid).get(),
+  ]);
+  const nowMs = Date.now();
+  const reviews: PublicReview[] = (reviewSnap?.docs ?? [])
+    .filter((d) => ((d.get("revealAt") as { toMillis?: () => number } | undefined)?.toMillis?.() ?? Infinity) <= nowMs)
+    .map((d) => ({
+      id: d.id,
+      rating: Number(d.get("rating")) || 0,
+      tags: Array.isArray(d.get("tags")) ? (d.get("tags") as string[]) : [],
+      text: String(d.get("text") ?? ""),
+      reviewerName: String(d.get("reviewerName") ?? ""),
+      via: d.get("via") === "link" ? "link" : "account",
+      dealTitle: String(d.get("dealTitle") ?? ""),
+      createdAt: d.get("createdAt")?.toDate ? d.get("createdAt").toDate().toISOString() : "",
+    }));
 
   const str = (v: unknown) => (typeof v === "string" ? v : "");
   const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
@@ -77,5 +99,7 @@ export const getPublicPassport = cache(async (rawHandle: string): Promise<Public
     }),
     memberSince: user.createdAt?.toDate ? user.createdAt.toDate().toISOString() : null,
     reliability: rel.exists ? ({ asCreator: rel.get("asCreator"), asBrand: rel.get("asBrand") } as Reliability) : null,
+    reviews,
+    ambassador: ambassadorLevel(refStats.exists ? Number(refStats.get("qualified")) || 0 : 0).title,
   };
 });

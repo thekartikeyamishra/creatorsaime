@@ -9,6 +9,7 @@ const nav = [
   { href: "/admin/users", label: "Members" },
   { href: "/admin/requests", label: "Data requests" },
   { href: "/admin/audit", label: "Audit log" },
+  { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/setup", label: "Setup check" },
   { href: "/dashboard", label: "My dashboard" },
 ];

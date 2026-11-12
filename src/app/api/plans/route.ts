@@ -11,12 +11,13 @@ export const runtime = "nodejs";
 
 export const GET = route(async (req) => {
   const ctx = await requireMember(req);
-  const { tier, expiresAt } = await getTier(ctx.uid);
+  const { tier, expiresAt, trial } = await getTier(ctx.uid);
   const orders = await adminDb().collection(C.orders).where("uid", "==", ctx.uid).where("status", "==", "paid").orderBy("createdAt", "desc").limit(50).get();
   return json(
     serialize({
       tier,
       expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
+      trial: tier === "growth" && trial,
       limits: LIMITS_BY_TIER[tier],
       products: Object.values(PRODUCTS),
       paymentsEnabled: razorpayConfigured(),

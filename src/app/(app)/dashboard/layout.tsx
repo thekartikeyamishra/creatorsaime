@@ -11,6 +11,7 @@ const nav = [
   { href: "/dashboard/profile", label: "Profile" },
   { href: "/dashboard/verification", label: "Verification" },
   { href: "/dashboard/plan", label: "Plan" },
+  { href: "/dashboard/referrals", label: "Invite & earn" },
   { href: "/dashboard/billing", label: "Billing details" },
   { href: "/dashboard/account", label: "Account" },
 ];
