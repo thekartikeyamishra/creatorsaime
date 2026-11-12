@@ -27,6 +27,26 @@ export function isAdminConfigured(): boolean {
   ) && Boolean(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT);
 }
 
+export type ServiceAccount = { project_id?: string; client_email?: string; private_key?: string };
+
+/**
+ * Reads the service account from env. Accepts base64 (recommended) or raw JSON pasted by mistake,
+ * strips wrapping quotes, and repairs private keys whose newlines arrived as literal "\\n".
+ * Returns null instead of throwing so callers decide how to report it.
+ */
+export function parseServiceAccount(value: string): ServiceAccount | null {
+  try {
+    const raw = value.trim().replace(/^["']|["']$/g, "");
+    const json = raw.startsWith("{") ? raw : Buffer.from(raw, "base64").toString("utf8");
+    const sa = JSON.parse(json) as ServiceAccount;
+    if (typeof sa !== "object" || !sa) return null;
+    if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, "\n");
+    return sa;
+  } catch {
+    return null;
+  }
+}
+
 function getAdminApp(): App {
   if (app) return app;
   const existing = getApps()[0];
@@ -40,12 +60,8 @@ function getAdminApp(): App {
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT;
   const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
   if (b64) {
-    let parsed: { project_id?: string; client_email?: string; private_key?: string };
-    try {
-      parsed = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
-    } catch {
-      throw new ServiceUnavailableError("FIREBASE_SERVICE_ACCOUNT_BASE64 is not valid base64 JSON");
-    }
+    const parsed = parseServiceAccount(b64);
+    if (!parsed) throw new ServiceUnavailableError("FIREBASE_SERVICE_ACCOUNT_BASE64 is not valid base64 JSON");
     app = initializeApp({
       credential: cert({
         projectId: parsed.project_id,
@@ -65,7 +81,9 @@ let db: Firestore | null = null;
 export function adminDb(): Firestore {
   if (db) return db;
   db = getFirestore(getAdminApp());
-  db.settings({ ignoreUndefinedProperties: true });
+  // preferRest: plain HTTPS instead of long-lived gRPC streams — no native/stream crashes on serverless,
+  // faster cold starts, and identical behaviour for our request/response workload.
+  db.settings({ ignoreUndefinedProperties: true, preferRest: true });
   return db;
 }
 

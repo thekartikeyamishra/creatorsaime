@@ -18,6 +18,13 @@ const fatal = [
 ].filter(([p]) => existsSync(p));
 
 const stray = ["components", "lib", "hooks", "styles", "utils", "types", "content", "data"].filter((p) => existsSync(p) && readdirSync(p).length > 0);
+// Config files from another project: Tailwind v4 here needs no config file, and a stray vitest.config.ts
+// takes priority over vitest.config.mts with the wrong "@/" alias.
+const strayFiles = ["tailwind.config.ts", "tailwind.config.js", "vitest.config.ts", "vitest.config.js", "postcss.config.js"].filter((p) => existsSync(p));
+if (strayFiles.length) {
+  console.warn(`\n⚠  Leftover config files from another project: ${strayFiles.join(", ")}`);
+  console.warn("   Delete them: git rm " + strayFiles.join(" ") + "\n");
+}
 
 if (stray.length) {
   console.warn(`\n⚠  Ignoring leftover root folders not used by CreatorsAI: ${stray.map((s) => s + "/").join(", ")}`);

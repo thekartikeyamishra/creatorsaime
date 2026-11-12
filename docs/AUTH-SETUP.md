@@ -8,6 +8,13 @@
 | `identitytoolkit.googleapis.com … 400` | Firebase rejected the sign-in. Since v0.10 the login screen shows the exact reason. Usual causes below. |
 | `www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig … 400` | Firebase Authentication isn't initialised for the project, or the API key is restricted. |
 
+## Quick triage
+
+1. **https://YOUR-SITE/api/ping** → `{"ok":true,...}` means the server runs. If this fails, the deployment itself is broken (check Vercel → Deployments → build log).
+2. **https://YOUR-SITE/api/health** → shows the live `version`. It must match the version you pushed.
+3. **https://YOUR-SITE/api/health?deep=1** → names the Firebase problem (below).
+4. Still failing? The app shows `(500, id bom1::xxxx)`. Vercel → your project → **Logs** → search that id → copy the red error line.
+
 ## First: run the self-diagnosis
 
 Open **https://creatorsai.me/api/health?deep=1**. Every check should say `"ok": true`. Any failing check names the problem and the fix (no secrets are shown):

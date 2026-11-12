@@ -39,7 +39,12 @@ export async function api<T>(path: string, opts: Options = {}): Promise<T> {
   }
   const data = (await res.json().catch(() => null)) as { error?: { code: string; message: string; fields?: Record<string, string> } } | null;
   if (!res.ok) {
-    throw new ApiClientError(res.status, data?.error?.code ?? "error", data?.error?.message ?? "Something went wrong", data?.error?.fields ?? {});
+    if (!data?.error) {
+      // Not our JSON: the hosting platform returned its own error page (the server function crashed or timed out).
+      const id = res.headers.get("x-vercel-id")?.split("::").pop();
+      throw new ApiClientError(res.status, `server_${res.status}`, `The server hit a problem (${res.status}${id ? `, id ${id}` : ""}). Please try again shortly.`);
+    }
+    throw new ApiClientError(res.status, data.error.code, data.error.message, data.error.fields ?? {});
   }
   return data as T;
 }

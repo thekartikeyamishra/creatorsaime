@@ -47,6 +47,13 @@ v0.4 turns everyday Deal Desk usage into data nobody else has. See **docs/MOATS.
 
 Live at **https://creatorsai.me** · built in public by Kartikeya Mishra — follow [@KartikeyahereX](https://x.com/KartikeyahereX)
 
+## What's new in v0.12
+
+- **Crash-proof backend:** Firestore uses HTTPS (`preferRest`) instead of gRPC streams on serverless; stray promise rejections are logged instead of crashing the instance (`src/instrumentation.ts`).
+- **Forgiving credentials:** the service account may be base64 *or* raw JSON, with or without quotes; private keys with literal `\n` are repaired (tested).
+- **`/api/ping`** (no dependencies) vs **`/api/health?deep=1`** (full diagnosis) pinpoint where a failure is.
+- Errors from the hosting platform now show status + Vercel request id instead of `(error)`.
+
 ## What's new in v0.11
 
 - **Self-diagnosis:** `/api/health?deep=1` checks Firebase config, admin key, Auth and Firestore and names the fix (no secrets).
